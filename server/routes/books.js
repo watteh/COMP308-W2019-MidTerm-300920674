@@ -35,7 +35,8 @@ router.get('/add', (req, res, next) => {
         } else {
             res.render('books/details', {
                 title: 'Add a Book',
-                books: books
+                books: books //,
+                    // displayName: req.user ? req.user.displayName : ''
             });
         }
     });
@@ -67,19 +68,50 @@ router.post('/add', (req, res, next) => {
 
 // GET the Book Details page in order to edit an existing Book
 router.get('/:id', (req, res, next) => {
-
-    /*****************
-     * ADD CODE HERE *
-     *****************/
+    // set variable to hold book id
+    let id = req.params.id;
+    // findById method used to find book with id in model
+    book.findById(id, (err, bookObj) => {
+        // If error, log it and end render
+        if (err) {
+            console.log(err);
+            res.end(err);
+            // otherwise, render details page with details filled in inputs
+        } else {
+            res.render('books/details', {
+                title: 'Update a Book',
+                books: bookObj //,
+                    // displayName: req.user ? req.user.displayName : ''
+            });
+        }
+    });
 });
 
 // POST - process the information passed from the details form and update the document
 router.post('/:id', (req, res, next) => {
+    // Set variable to hold book id
+    let id = req.params.id;
 
-    /*****************
-     * ADD CODE HERE *
-     *****************/
-
+    // Set variable to create new book object that has same id as book being updated
+    let updatedBook = book({
+        "_id": id,
+        "Title": req.body.title,
+        "Description": req.body.description,
+        "Price": req.body.price,
+        "Author": req.body.author,
+        "Genre": req.body.genre
+    });
+    // use book model update method to update the book with the id with the new book object
+    book.update({ _id: id }, updatedBook, (err) => {
+        // if error, log error and end render
+        if (err) {
+            console.log(err);
+            res.end(err);
+            // otherwise, redirect user back to books list
+        } else {
+            res.redirect('/books');
+        }
+    });
 });
 
 // GET - process the delete by user id
