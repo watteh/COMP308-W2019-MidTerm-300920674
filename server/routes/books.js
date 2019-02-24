@@ -4,15 +4,24 @@ let express = require('express');
 let router = express.Router();
 let mongoose = require('mongoose');
 
+// add passport module
+let passport = require('passport');
+
 // define the book model
 let book = require('../models/books');
 
-// create a reference to the controller
-// let booksController = require('../controllers/contact');
+// function to require authorization
+function requireAuth(req, res, next) {
+    //check to see if the user is logged in
+    if (!req.isAuthenticated()) {
+        return res.redirect('./login');
+    }
+    next();
+}
 
 // GET BOOKS LIST FUNCTION
 /* GET books List page. READ */
-router.get('/', (req, res, next) => {
+router.get('/', requireAuth, (req, res, next) => {
     // find all books in the books collection
     book.find((err, books) => {
         if (err) {
@@ -20,7 +29,8 @@ router.get('/', (req, res, next) => {
         } else {
             res.render('books/index', {
                 title: 'Books',
-                books: books
+                books: books,
+                displayName: req.user ? req.user.displayName : ''
             });
         }
     });
@@ -29,7 +39,7 @@ router.get('/', (req, res, next) => {
 
 // GET BOOK DETAILS FUNCTION
 //  GET the Book Details page in order to add a new Book
-router.get('/add', (req, res, next) => {
+router.get('/add', requireAuth, (req, res, next) => {
     // Add find method with books list as details page is used for both add and edit
     book.find((err, books) => {
         // If results in error, log error
@@ -39,8 +49,8 @@ router.get('/add', (req, res, next) => {
         } else {
             res.render('books/details', {
                 title: 'Add a Book',
-                books: '' //,
-                    // displayName: req.user ? req.user.displayName : ''
+                books: '',
+                displayName: req.user ? req.user.displayName : ''
             });
         }
     });
@@ -48,7 +58,7 @@ router.get('/add', (req, res, next) => {
 
 // ADD NEW BOOK FUNCTION
 // POST process the Book Details page and create a new Book - CREATE
-router.post('/add', (req, res, next) => {
+router.post('/add', requireAuth, (req, res, next) => {
     // create new book object with data from fields - included description field
     let newBook = book({
         "Title": req.body.title,
@@ -74,7 +84,7 @@ router.post('/add', (req, res, next) => {
 
 // GET BOOK DETAILS FUNCTION
 // GET the Book Details page in order to edit an existing Book
-router.get('/:id', (req, res, next) => {
+router.get('/:id', requireAuth, (req, res, next) => {
     // set variable to hold book id
     let id = req.params.id;
     // findById method used to find book with id in model
@@ -87,8 +97,8 @@ router.get('/:id', (req, res, next) => {
         } else {
             res.render('books/details', {
                 title: 'Update a Book',
-                books: bookObj //,
-                    // displayName: req.user ? req.user.displayName : ''
+                books: bookObj,
+                displayName: req.user ? req.user.displayName : ''
             });
         }
     });
@@ -96,7 +106,7 @@ router.get('/:id', (req, res, next) => {
 
 //  UPDATE BOOK FUNCTION
 // POST - process the information passed from the details form and update the document
-router.post('/:id', (req, res, next) => {
+router.post('/:id', requireAuth, (req, res, next) => {
     // Set variable to hold book id
     let id = req.params.id;
 
@@ -124,7 +134,7 @@ router.post('/:id', (req, res, next) => {
 
 // DELETE BOOK FUNCTION
 // GET - process the delete by user id
-router.get('/delete/:id', (req, res, next) => {
+router.get('/delete/:id', requireAuth, (req, res, next) => {
     // Set variable to hold book id
     let id = req.params.id;
 
