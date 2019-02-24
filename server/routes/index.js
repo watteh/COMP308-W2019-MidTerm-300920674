@@ -10,7 +10,7 @@ let book = require('../models/books');
 
 // define the user model
 let userModel = require('../models/user');
-let User = userModel.user; // alias for user
+let User = userModel.User; // alias for user
 
 /* GET home page. wildcard */
 router.get('/', (req, res, next) => {
@@ -30,6 +30,7 @@ router.get('/login', (req, res, next) => {
             messages: req.flash('loginMessage'),
             displayName: req.user ? req.user.displayName : ''
         });
+        // otherwise, redirect to home page
     } else {
         return res.redirect('/');
     }
@@ -37,6 +38,7 @@ router.get('/login', (req, res, next) => {
 
 // POST to process login page
 router.post('/login', (req, res, next) => {
+    // authenticate user, show error message if authentication fails and redurect to login
     passport.authenticate('local', (err, user, info) => {
         if (err) {
             return next(err);
@@ -45,6 +47,7 @@ router.post('/login', (req, res, next) => {
             req.flash('loginMessage', 'Authentication Error');
             return res.redirect('/login');
         }
+        // login user, show error if login fails, otherwise redirect to books list
         req.logIn(user, (err) => {
             if (err) {
                 return next(err);
@@ -56,6 +59,7 @@ router.post('/login', (req, res, next) => {
 
 // GET to display registration page
 router.get('/register', (req, res, next) => {
+    // renders register page if no user signed in, otherwise, redirect to home page
     if (!req.user) {
         res.render('auth/register', {
             title: 'Register',
@@ -76,6 +80,7 @@ router.post('/register', (req, res, next) => {
         displayName: req.body.displayName
     });
 
+    // register user with new object, displaying error if there is one, otherwise redirects new user to books list
     User.register(
         newUser,
         req.body.password,
