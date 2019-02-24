@@ -116,10 +116,20 @@ router.post('/:id', (req, res, next) => {
 
 // GET - process the delete by user id
 router.get('/delete/:id', (req, res, next) => {
+    // Set variable to hold book id
+    let id = req.params.id;
 
-    /*****************
-     * ADD CODE HERE *
-     *****************/
+    // Use remove method of book model to delete db object
+    book.remove({ _id: id }, (err) => {
+        // if error, log error and end rendering
+        if (err) {
+            console.log(err);
+            res.end(err);
+            // otherwise, redirect user back to books list
+        } else {
+            res.redirect('/books');
+        }
+    });
 });
 
 
