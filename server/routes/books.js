@@ -39,7 +39,7 @@ router.get('/add', (req, res, next) => {
         } else {
             res.render('books/details', {
                 title: 'Add a Book',
-                books: books //,
+                books: '' //,
                     // displayName: req.user ? req.user.displayName : ''
             });
         }
