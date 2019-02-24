@@ -1,15 +1,14 @@
 let mongoose = require('mongoose');
 
 // create a model class
-let gamesSchema = mongoose.Schema({
+let booksSchema = mongoose.Schema({
     Title: String,
     Description: String,
     Price: Number,
     Author: String,
     Genre: String
-},
-{
-  collection: "books"
+}, {
+    collection: "books"
 });
 
-module.exports = mongoose.model('books', gamesSchema);
+module.exports = mongoose.model('books', booksSchema);
